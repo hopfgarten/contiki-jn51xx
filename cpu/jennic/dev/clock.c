@@ -80,8 +80,35 @@ hrclock_t
 clock_hrtime()
 {
   static hrclock_t time = 0;
-  if(!ticking) clock_init();
   time += u32AHI_TickTimerRead()/TICKS_TO_USEC;
   vAHI_TickTimerWrite(4);
   return time;
 }
+
+
+#ifdef JENNIC_CONF_TIMESYNC
+
+#include "uip.h"
+#include "ieee802.h"
+
+static uint8_t synced = 0;
+static hrclock_t offset = 0;
+uint8_t clock_synced()
+{
+  return synced;
+}
+
+hrclock_t clock_synced_hrtime()
+{
+  return clock_hrtime() + offset;
+}
+
+void clock_synchronize()
+{
+  synced = 1;
+  memcpy(&offset, UIP_ICMP6_TIMESTAMP, sizeof(hrclock_t));
+  offset = offset + 1800 - ieee_get_last_timestamp();   //offset = master_clock - recved_clock + time_delay
+}
+
+#endif
+
