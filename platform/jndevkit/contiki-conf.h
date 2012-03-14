@@ -95,6 +95,8 @@ typedef unsigned short uip_stats_t;
 typedef unsigned long clock_time_t;
 #define CLOCK_CONF_SECOND 1000
 
+#define JENNIC_CONF_TIMESYNC 1
+
 /* Not part of C99 but actually present */
 int strcasecmp(const char*, const char*);
 

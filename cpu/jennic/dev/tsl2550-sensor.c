@@ -105,12 +105,12 @@ value(int type)
     case LIGHT_VALUE_VISIBLE_CENTILUX:
       while (!(ch0 & IS_VALID)) {
         buf[0] = TSL_READ_ADC0; i2cb(TSL_ADDR,1,1,buf);
-        ch0 = buf[1]
+        ch0 = buf[1];
       }
 
       while (!(ch1 & IS_VALID)) {
         buf[0] = TSL_READ_ADC1; i2cb(TSL_ADDR,1,1,buf);
-        ch1 = buf[1]
+        ch1 = buf[1];
       }
 
       /* strip valid bits */
