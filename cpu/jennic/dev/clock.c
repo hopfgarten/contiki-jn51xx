@@ -39,14 +39,28 @@
 #define TICKS_TO_USEC  (16)
 #define TICK_TIMER_MAX (0x0fffffff)
 
+/* enable/disable interrupts */
+#define ENABLE_INTERRUPTS();  {  register uint32 ru32CtrlReg; asm volatile ("l.mfspr %0, r0, 17;" :"=r"(ru32CtrlReg) : ); ru32CtrlReg |= 6; asm volatile ("l.mtspr r0, %0, 17;" : :"r"(ru32CtrlReg)); } 
+
+#define DISABLE_INTERRUPTS(); { register uint32 ru32CtrlReg; asm volatile ("l.mfspr %0, r0, 17;" :"=r"(ru32CtrlReg) : ); ru32CtrlReg &= 0xfffffff9; asm volatile ("l.mtspr r0, %0, 17;" : :"r"(ru32CtrlReg)); }
+
 static bool ticking = false;
+
+void 
+tick_timer_int(uint32 u32Device, uint32 u32ItemBitmap)
+{
+  //update clock
+  clock_hrtime();
+}
 
 void
 clock_init()
 {
   vAHI_TickTimerInterval(TICK_TIMER_MAX);
-  vAHI_TickTimerConfigure(E_AHI_TICK_TIMER_CONT);
   vAHI_TickTimerWrite(0);
+  vAHI_TickTimerIntEnable(1);
+  vAHI_TickTimerRegisterCallback(&tick_timer_int);
+  vAHI_TickTimerConfigure(E_AHI_TICK_TIMER_RESTART);
   ticking = true;
 }
 
@@ -79,10 +93,17 @@ clock_delay(unsigned int i)
 hrclock_t
 clock_hrtime()
 {
-  static hrclock_t time = 0;
-  time += u32AHI_TickTimerRead()/TICKS_TO_USEC;
-  vAHI_TickTimerWrite(4);
-  return time;
+  DISABLE_INTERRUPTS();
+  static hrclock_t ticks = 0;
+  static uint32_t last_tick = 0;
+  uint32_t temp_tick = u32AHI_TickTimerRead();
+  if (last_tick > temp_tick )
+    ticks += temp_tick + (TICK_TIMER_MAX - last_tick);
+  else
+    ticks += (temp_tick - last_tick); 
+  last_tick = temp_tick;
+  ENABLE_INTERRUPTS();
+  return ticks/TICKS_TO_USEC;
 }
 
 
