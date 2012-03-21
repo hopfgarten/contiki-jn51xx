@@ -46,11 +46,20 @@
 
 static bool ticking = false;
 
+static void (*function_int)(void) = NULL;
+static uint32_t interrupt_interval_us;
+
 void 
 tick_timer_int(uint32 u32Device, uint32 u32ItemBitmap)
 {
-  //update clock
-  clock_hrtime();
+  if(function_int != NULL) {
+    function_int();
+    uint32_t temp_tick = u32AHI_TickTimerRead();
+    //ticks abziehen wegen berechnung
+    uint32_t ticks_required = (interrupt_interval_us - (clock_synced_hrtime() % interrupt_interval_us)) * TICKS_TO_USEC;
+    vAHI_TickTimerInterval((temp_tick + ticks_required) % TICK_TIMER_MAX);
+  } else  
+    clock_hrtime();
 }
 
 void
@@ -60,7 +69,7 @@ clock_init()
   vAHI_TickTimerWrite(0);
   vAHI_TickTimerIntEnable(1);
   vAHI_TickTimerRegisterCallback(&tick_timer_int);
-  vAHI_TickTimerConfigure(E_AHI_TICK_TIMER_RESTART);
+  vAHI_TickTimerConfigure(E_AHI_TICK_TIMER_CONT);
   ticking = true;
 }
 
@@ -129,6 +138,17 @@ void clock_synchronize()
   synced = 1;
   memcpy(&offset, UIP_ICMP6_TIMESTAMP, sizeof(hrclock_t));
   offset = offset + 1800 - ieee_get_last_timestamp();   //offset = master_clock - recved_clock + time_delay
+  //printf("new offset\r\n");
+}
+
+void clock_set_interrupt_function(void (*function)(void), uint32_t interval_us)
+{
+  function_int = function;
+  interrupt_interval_us = interval_us;
+  uint32_t temp_tick = u32AHI_TickTimerRead();
+  //ticks abziehen wegen berechnung
+  uint32_t ticks_required = (interrupt_interval_us - (clock_synced_hrtime() % interrupt_interval_us)) * TICKS_TO_USEC; 
+  vAHI_TickTimerInterval((temp_tick + ticks_required) % TICK_TIMER_MAX);
 }
 
 #endif

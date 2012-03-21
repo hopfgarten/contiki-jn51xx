@@ -51,6 +51,8 @@ hrclock_t clock_synced_hrtime();
 
 void clock_synchronize();
 
+void clock_set_interrupt_function(void (*function)(void), uint32_t interval_us);
+
 #endif
 
 #endif /* CPU/JENNIC/DEV/HRCLOCK_H_ */
