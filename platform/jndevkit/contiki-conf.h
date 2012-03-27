@@ -97,6 +97,9 @@ typedef unsigned long clock_time_t;
 
 #define JENNIC_CONF_TIMESYNC 1
 
+typedef unsigned long long rtimer_clock_t;
+#define RTIMER_CLOCK_LT(a,b)     ((signed short)((a)-(b)) < 0)
+
 /* Not part of C99 but actually present */
 int strcasecmp(const char*, const char*);
 
