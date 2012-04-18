@@ -13,4 +13,4 @@ TARGET_STARTFILES = ${addprefix $(OBJECTDIR)/,contiki-main.o}
 
 ### Define the CPU directory
 CONTIKI_CPU=$(CONTIKI)/cpu/jennic
-include $(CONTIKI)/cpu/jennic/Makefile.jn51xx
+include $(CONTIKI)/cpu/jennic/Makefile.jn51xx 
