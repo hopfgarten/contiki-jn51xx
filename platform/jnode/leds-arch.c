@@ -42,6 +42,10 @@ static uint8_t leds;
 void
 leds_arch_init(void)
 {
+  vAHI_DioSetDirection(0, E_AHI_DIO8_INT|
+                          E_AHI_DIO9_INT|
+                          E_AHI_DIO10_INT|
+                          E_AHI_DIO16_INT);
   leds_arch_set(0);
 }
 
@@ -57,15 +61,14 @@ leds_arch_set(unsigned char c)
 {
   leds = c;
 
-  //if ((c&LEDS_ALL) || (c&LEDS_RED && c&LEDS_GREEN))
-  //  vAHI_DioSetDirection(0, E_AHI_DIO16_INT|
-  //                          E_AHI_DIO17_INT);
-  //else if (c&LEDS_RED)
-  //  vAHI_DioSetDirection(E_AHI_DIO16_INT, E_AHI_DIO17_INT);
-  //else if (c&LEDS_GREEN)
-  //  vAHI_DioSetDirection(E_AHI_DIO17_INT, E_AHI_DIO16_INT);
-  //else
-  //  vAHI_DioSetDirection(E_AHI_DIO17_INT|
-  //                       E_AHI_DIO16_INT, 0);
+  uint32_t on = 0;
+  uint32_t off = 0;
+ 
+  if (leds & LEDS_GREEN) off |= E_AHI_DIO16_INT; else on |= E_AHI_DIO16_INT;
+  if (leds & LEDS_INFRARED0) off |= E_AHI_DIO8_INT; else on |= E_AHI_DIO8_INT;
+  if (leds & LEDS_INFRARED1) off |= E_AHI_DIO9_INT; else on |= E_AHI_DIO9_INT;
+  if (leds & LEDS_INFRARED2) off |= E_AHI_DIO10_INT; else on |= E_AHI_DIO10_INT;
+
+  vAHI_DioSetOutput(on, off);
 }
 

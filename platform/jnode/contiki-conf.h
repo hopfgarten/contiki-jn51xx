@@ -96,6 +96,12 @@ typedef unsigned short uip_stats_t;
 typedef unsigned long clock_time_t;
 #define CLOCK_CONF_SECOND 1000
 
+#define LEDS_GREEN     0x01
+#define LEDS_INFRARED0 0x02
+#define LEDS_INFRARED1 0x04
+#define LEDS_INFRARED2 0x08
+#define LEDS_CONF_ALL  0x0f
+
 /* Not part of C99 but actually present */
 int strcasecmp(const char*, const char*);
 

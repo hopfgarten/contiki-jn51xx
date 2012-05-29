@@ -22,7 +22,7 @@
 #define PRINTF(...)
 #endif
 
-#ifndef MIN
+#ifndef MIN 
 #define MIN(a, b)_((a) < (b) ? (a) : (b))
 #endif /* MIN */
 

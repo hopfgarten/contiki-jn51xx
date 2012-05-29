@@ -208,7 +208,7 @@ DSTATUS disk_initialize (BYTE drive)
   vAHI_SpiConfigure(2,   // number of spi slave select line
                     E_AHI_SPIM_MSB_FIRST,
                     0,0, // polarity and phase
-                    0,   // min clock divisor
+                    1,   // min clock divisor
                     E_AHI_SPIM_INT_DISABLE,
                     E_AHI_SPIM_AUTOSLAVE_DSABL);
 

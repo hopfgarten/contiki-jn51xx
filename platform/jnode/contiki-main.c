@@ -3,7 +3,6 @@
 #include "bootloader.h"
 #include "gdb2.h"
 #include "jts.h"
-#include "pff.h"
 #include "net/ieee802.h"
 #include "dev/lightlevel-sensor.h"
 #include "dev/proximity-sensor.h"
@@ -56,7 +55,6 @@ init_net(void)
 
 void AppColdStart(void)
 {
-  static FATFS fs;
   static uint8_t i=0;
 
   /* default startup, and make sure STBY pin of power reg is low,
@@ -67,24 +65,7 @@ void AppColdStart(void)
 
   /* initialize the sd-card first and wait for power supply to stabilize */
   clock_delay(CLOCK_SECOND/5);
-  switch(pf_mount(&fs)){
-  case FR_OK:
-    break;
-  case FR_NO_FILESYSTEM:
-    printf("pf_mount() failed: no filesystem\n");
-    break;
-  case FR_DISK_ERR:
-  case FR_NOT_READY:
-    printf("pf_mount() failed: no card found\n");
-    break;
-  default:
-    printf("pf_mount() failed\n");
-    break;
-  }
-  printf("waiting to stabilize ...");
-  clock_delay(CLOCK_SECOND*5);
-  printf(" done\n");
-
+  
   /* start the rest */
   process_init();
   init_net();
