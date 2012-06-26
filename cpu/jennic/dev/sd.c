@@ -208,7 +208,7 @@ DSTATUS disk_initialize (BYTE drive)
   vAHI_SpiConfigure(2,   // number of spi slave select line
                     E_AHI_SPIM_MSB_FIRST,
                     0,0, // polarity and phase
-                    1,   // min clock divisor
+                    0,   // min clock divisor
                     E_AHI_SPIM_INT_DISABLE,
                     E_AHI_SPIM_AUTOSLAVE_DSABL);
 
@@ -285,12 +285,14 @@ DRESULT disk_read (BYTE drive, BYTE* buffer, DWORD start_sector, BYTE sector_cou
       vAHI_SpiStartTransfer8(SPI_IDLE);
       vAHI_SpiWaitBusy(); 
       
-      return RES_OK;
-    } else {
+    } 
+    else 
+    {
       RAISE_CS();
       return RES_ERROR;
     }
   }
+  return RES_OK;
 }
 
 
@@ -302,83 +304,82 @@ DRESULT disk_write (BYTE drive, const BYTE* buffer, DWORD start_sector, BYTE sec
   if (drive)
     return RES_PARERR;
   
-  uint8_t temp;
+  uint8_t temp = RES_OK;
   uint16_t i, n;
-  for (n = 0; n < sector_count; n++)
+  for (n = 0; n < sector_count && temp == RES_OK; n++)
   {
-      uint32_t argument = (start_sector + n) * address_mult;
+    uint32_t argument = (start_sector + n) * address_mult;
 
-      LOWER_CS();
+    LOWER_CS();
 
-      command(WRITE_BLOCK, argument);
+    command(WRITE_BLOCK, argument);
   
-      /* wait for response */
-      for (i = 0; i < SD_READ_RESPONSE_ATTEMPTS; i++)
-      {
-        vAHI_SpiStartTransfer8(SPI_IDLE);
-        vAHI_SpiWaitBusy(); 
-        temp = u8AHI_SpiReadTransfer8();
-        if (!temp)
-          break;
-      }
-      if (temp)
-      {
-        RAISE_CS();
-        return RES_NOTRDY;
-      }
-      
-      /* send some idles before start token (required?) */
-      for (i = 0; i < 8; i++)
-      {
-        vAHI_SpiStartTransfer8(SPI_IDLE);
-        vAHI_SpiWaitBusy();
-      }
-      
-      /* send start token */
-      vAHI_SpiStartTransfer8(START_BLOCK_TOKEN);
-      vAHI_SpiWaitBusy();
-      
-      /* send bytes */
-      for (i = 0; i < SD_DEFAULT_BLOCK_SIZE; i++)
-      {
-        vAHI_SpiWaitBusy();
-        vAHI_SpiStartTransfer8(buffer[i + (n * SD_DEFAULT_BLOCK_SIZE)]);
-      }
-    
-      /* wait for data response token */
-      for(i = 0; i < SD_TRANSACTION_ATTEMPTS; i++) 
-      {
-        vAHI_SpiStartTransfer8(SPI_IDLE);
-        vAHI_SpiWaitBusy();
-        temp = u8AHI_SpiReadTransfer8();
-        if ((temp & 0x11) == 1) 
-        {
-          /* Data response token received. */
-          temp = (temp >> 1) & 0x7;
-          if(temp == DATA_ACCEPTED) 
-          {
-            temp = RES_OK;
-            break;
-          } 
-          else 
-          {
-            temp = RES_ERROR;
-            break;
-          }
-        }
-      }      
-
-      /* wait until sd card is finished */
-      while (u8AHI_SpiReadTransfer8() != SPI_IDLE) 
-      {
-        vAHI_SpiStartTransfer8(SPI_IDLE);
-        vAHI_SpiWaitBusy();
-      }
-
-      RAISE_CS();
-  
-      return temp;
+    /* wait for response */
+    for (i = 0; i < SD_READ_RESPONSE_ATTEMPTS; i++)
+    {
+      vAHI_SpiStartTransfer8(SPI_IDLE);
+      vAHI_SpiWaitBusy(); 
+      temp = u8AHI_SpiReadTransfer8();
+      if (!temp)
+        break;
     }
+    if (temp)
+    {
+      RAISE_CS();
+      return RES_NOTRDY;
+    }
+      
+    /* send some idles before start token (required?) */
+    for (i = 0; i < 8; i++)
+    {
+      vAHI_SpiStartTransfer8(SPI_IDLE);
+      vAHI_SpiWaitBusy();
+    }
+      
+    /* send start token */
+    vAHI_SpiStartTransfer8(START_BLOCK_TOKEN);
+    vAHI_SpiWaitBusy();
+     
+    /* send bytes */
+    for (i = 0; i < SD_DEFAULT_BLOCK_SIZE; i++)
+    {
+      vAHI_SpiWaitBusy();
+      vAHI_SpiStartTransfer8(buffer[i + (n * SD_DEFAULT_BLOCK_SIZE)]);
+    }
+    
+    /* wait for data response token */
+    for(i = 0; i < SD_TRANSACTION_ATTEMPTS; i++) 
+    {
+      vAHI_SpiStartTransfer8(SPI_IDLE);
+      vAHI_SpiWaitBusy();
+      temp = u8AHI_SpiReadTransfer8();
+      if ((temp & 0x11) == 1) 
+      {
+        /* Data response token received. */
+        temp = (temp >> 1) & 0x7;
+        if(temp == DATA_ACCEPTED) 
+        {
+          temp = RES_OK;
+          break;
+        } 
+        else 
+        {
+          temp = RES_ERROR;
+          break;
+        }
+      }
+    }      
+
+    /* wait until sd card is finished */
+    while (u8AHI_SpiReadTransfer8() != SPI_IDLE) 
+    {
+      vAHI_SpiStartTransfer8(SPI_IDLE);
+      vAHI_SpiWaitBusy();
+    }
+
+    RAISE_CS();
+  }
+  return temp;
 }
 #endif
 
