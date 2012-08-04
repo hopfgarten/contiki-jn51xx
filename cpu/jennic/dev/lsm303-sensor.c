@@ -41,7 +41,7 @@
 #include <AppHardwareApi.h>
 
 /* ------- Register names ------- */
-#define LSM303_ADDR_A            0x32
+#define LSM303_ADDR_A            0x30
 #define LSM303_ADDR_M            0x3c
 #define LSM303_CTRL_REG1         0x20
 #define LSM303_CTRL_REG2         0x21
@@ -117,24 +117,59 @@ avalue(int type)
 static int
 aconfigure(int type, int v)
 {
+  uint8_t buf[2];
+
   switch (type) {
   case SENSORS_HW_INIT:
   case SENSORS_ACTIVE:
-    if (v)
-    {
-      if (!I2CW(LSM303_ADDR_A,LSM303_CTRL_REG1,0x3f))
+    if (v) {
+      /* normal mode, 100Hz output rate, enable all axes */
+      if (!I2CW(LSM303_ADDR_A,LSM303_CTRL_REG1,0x2f))
         return false; /* see if we get an ack */
-      I2CW(LSM303_ADDR_A,LSM303_CTRL_REG4,0x30);
+
+      /* +-2g, block update enabled */
+      I2CW(LSM303_ADDR_A,LSM303_CTRL_REG4,0x80);
 
       acc_active = true;
       acc_startsample(true);
       return true;
     }
-    else
-    {
+    else {
       acc_active = false;
       return I2CW(LSM303_ADDR_A,LSM303_CTRL_REG1,0x00);
     }
+  case ACC_LSM303_RANGE:
+    I2CW(LSM303_ADDR_A,LSM303_CTRL_REG4,(1<<7)|((v&3)<<4));
+    break;
+
+  case ACC_LSM303_DRATE:
+    if (v<ACC_LSM303VAL_0_5HZ || v>ACC_LSM303VAL_1KHZ)
+      return 1;
+    else if (v<ACC_LSM303VAL_50HZ)  /* low-power mode */
+      I2CW(LSM303_ADDR_A,LSM303_CTRL_REG1,(v<<5)|0x07);
+    else if (v>=ACC_LSM303VAL_50HZ) /* normal mode    */
+      I2CW(LSM303_ADDR_A,LSM303_CTRL_REG1,(1<<5)|((v-ACC_LSM303VAL_50HZ)<<3)|0x07);
+    break;
+
+  case ACC_LSM303_HIGHPASS:
+    buf[0]=LSM303_CTRL_REG2;
+    i2cb(LSM303_ADDR_A,1,1,buf);
+    buf[1]&=~(0x02);
+    buf[1]|=v|(1<<5);
+    i2cb(LSM303_ADDR_A,2,0,buf);
+    break;
+
+  case ACC_LSM303_FILTER:
+    buf[0]=LSM303_CTRL_REG2;
+    i2cb(LSM303_ADDR_A,1,1,buf);
+
+    if (v==ACC_LSM303VAL_NONE)
+      buf[1]&=~(1<<4); // unset FDS bit
+    else if (v==ACC_LSM303VAL_BOTH)
+      buf[1]|=(1<<4);  // set FDS bit
+
+    i2cb(LSM303_ADDR_A,2,0,buf);
+    break;
   }
 
   return 0;
@@ -179,10 +214,10 @@ mvalue(int type)
     return (int16_t) (mag_transaction.buf[1]|(mag_transaction.buf[2]<<8));
 
   case MAG_VALUE_Y:
-    return (int16_t) (mag_transaction.buf[3]|(mag_transaction.buf[4]<<8));
+    return (int16_t) (mag_transaction.buf[5]|(mag_transaction.buf[6]<<8));
 
   case MAG_VALUE_Z:
-    return (int16_t) (mag_transaction.buf[5]|(mag_transaction.buf[6]<<8));
+    return (int16_t) (mag_transaction.buf[3]|(mag_transaction.buf[4]<<8));
 
   default:
     return 0;
@@ -201,7 +236,8 @@ mconfigure(int type, int v)
     {
       if (!I2CW(LSM303_ADDR_M,LSM303_CRA_REG_M,0x1c))
         return false; /* output rate: 220Hz */
-      I2CW(LSM303_ADDR_M,LSM303_CRB_REG_M,0xe0);  /* gain +8.1Gauss  */
+      //I2CW(LSM303_ADDR_M,LSM303_CRB_REG_M,0xe0);  /* gain +8.1Gauss  */
+      I2CW(LSM303_ADDR_M,LSM303_CRB_REG_M,0x20);  /* gain +1.3Gauss  */
       I2CW(LSM303_ADDR_M,LSM303_MR_REG_M,0x00);   /* continuous mode */
 
       mag_active = true;

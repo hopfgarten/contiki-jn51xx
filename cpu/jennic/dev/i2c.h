@@ -52,9 +52,8 @@ typedef struct i2c_handle {
  * transaction is complete and returns the status. Or callback will be called
  * with the tranaction status once it has completed in interrupt context.
  *
- * In callback multiple calls will queued on a list and executes after each
- * other.
- */
+ * If a callback is given, multiple calls will be queued and execute in the
+ * order of the original calls to i2c().  */
 void i2c(i2c_t *t);
 bool i2cb(u8_t addr, u8_t wrlen, u8_t rdlen, u8_t buf[]);
 #define I2CW(addr,args...) i2cb(addr,sizeof((u8_t[]){args}),0,(u8_t[]){args})

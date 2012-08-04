@@ -88,6 +88,8 @@ typedef unsigned short uip_stats_t;
 
 #endif /* UIP_CONF_IPV6 */
 
+#define JENNIC_CONF_BUTTON_PIN (IRQ_DIO9|IRQ_DIO10)
+
 #define RIMEADDR_CONF_SIZE            8
 #define UIP_CONF_LL_802154            1
 #define UIP_CONF_LLH_LEN              14

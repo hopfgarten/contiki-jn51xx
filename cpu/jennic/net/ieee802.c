@@ -137,7 +137,7 @@ ieee_send(mac_callback_t cb, void *ptr)
   else
   {
     req.uParam.sReqData.sFrame.sDstAddr.u8AddrMode      = LONG;
-    req.uParam.sReqData.sFrame.sDstAddr.u16PanId        = SICSLOWPAN_PANID;
+    req.uParam.sReqData.sFrame.sDstAddr.u16PanId        = IEEE802154_PANDID;
     req.uParam.sReqData.sFrame.sDstAddr.uAddr.sExt.u32H =
       ((MAC_ExtAddr_s*) packetbuf_addr(PACKETBUF_ADDR_RECEIVER))->u32L;
     req.uParam.sReqData.sFrame.sDstAddr.uAddr.sExt.u32L =
@@ -146,7 +146,7 @@ ieee_send(mac_callback_t cb, void *ptr)
 
   /* fill in source address */
   req.uParam.sReqData.sFrame.sSrcAddr.u8AddrMode      = LONG;
-  req.uParam.sReqData.sFrame.sSrcAddr.u16PanId        = SICSLOWPAN_PANID;
+  req.uParam.sReqData.sFrame.sSrcAddr.u16PanId        = IEEE802154_PANDID;
   req.uParam.sReqData.sFrame.sSrcAddr.uAddr.sExt.u32H =
     ((MAC_ExtAddr_s*) ieee_get_mac())->u32L;
   req.uParam.sReqData.sFrame.sSrcAddr.uAddr.sExt.u32L =
@@ -398,7 +398,7 @@ ieee_init()
   req_reset(true);
 
   /* set panid and default parameters */
-  MAC_vPibSetPanId(mac, SICSLOWPAN_PANID);
+  MAC_vPibSetPanId(mac, IEEE802154_PANDID);
   MAC_vPibSetRxOnWhenIdle(mac, true, false);
 
   /* allocate an event for this process */
@@ -477,7 +477,9 @@ PROCESS_THREAD(ieee_process, ev, data)
   PROCESS_END();
 }
 
+#if USE_TS
 hrclock_t ieee_get_last_timestamp()
 {
   return current_timestamp;
 }
+#endif

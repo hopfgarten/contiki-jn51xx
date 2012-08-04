@@ -3,9 +3,9 @@ ifndef CONTIKI
 endif
 
 CONTIKI_TARGET_SOURCEFILES += ieee802.c bootloader.c\
-	leds-arch.c leds.c contiki-main.c button-sensor.c battery-sensor.c \
+	leds-arch.c leds.c contiki-main.c button-sensor.c \
 	tsl2550-sensor.c adxl202-sensor.c inttemp-sensor.c sensors.c\
-	tsop362-sensor.c mcp9800-sensor.c
+	tsop362-sensor.c 
 CONTIKI_SOURCEFILES += $(CONTIKI_TARGET_SOURCEFILES)
 CONTIKI_TARGET_DIRS = . dev
 TARGET_STARTFILES = ${addprefix $(OBJECTDIR)/,contiki-main.o}

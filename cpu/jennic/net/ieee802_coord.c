@@ -72,7 +72,7 @@ req_start(uint8_t chan, bool coord)
 
   mlmereq.u8Type = MAC_MLME_REQ_START;
   mlmereq.u8ParamLength = sizeof(MAC_MlmeReqScan_s);
-  mlmereq.uParam.sReqStart.u16PanId          = SICSLOWPAN_PANID;
+  mlmereq.uParam.sReqStart.u16PanId          = IEEE802154_PANDID;
   mlmereq.uParam.sReqStart.u8Channel         = chan;
   mlmereq.uParam.sReqStart.u8BeaconOrder     = BEACON_ORDER;
   mlmereq.uParam.sReqStart.u8SuperframeOrder = SUPERFRAME_ORDER;

@@ -37,6 +37,7 @@
 #include "dev/i2c.h"
 #include "dev/l3g4200d-sensor.h"
 #include <AppHardwareApi.h>
+#include <math.h>
 
 /* ------- Register names ------- */
 #define L3G4200D_ADDR          0xD0
@@ -89,17 +90,15 @@ static i2c_t gyro_txn = {
 static int
 value(int type)
 {
+  int16_t x=(int16_t) (gyro_txn.buf[2]<<8)|gyro_txn.buf[1],
+          y=(int16_t) (gyro_txn.buf[4]<<8)|gyro_txn.buf[3],
+          z=(int16_t) (gyro_txn.buf[6]<<8)|gyro_txn.buf[5];
+
   switch(type) {
-  case GYRO_VALUE_X_DGS:
-    return (int16_t) (gyro_txn.buf[2]<<8)|gyro_txn.buf[1];
-
-  case GYRO_VALUE_Y_DGS:
-    return (int16_t) (gyro_txn.buf[4]<<8)|gyro_txn.buf[3];
-
-  case GYRO_VALUE_Z_DGS:
-    return (int16_t) (gyro_txn.buf[6]<<8)|gyro_txn.buf[5];
-
-  case GYRO_VALUE_TEMP_CELSIUS:
+  case GYRO_VALUE_X: return x;
+  case GYRO_VALUE_Y: return y;
+  case GYRO_VALUE_Z: return z;
+  case GYRO_VALUE_TEMP:
     return rreg(L3G4200D_OUT_TEMP);
   }
 
@@ -114,12 +113,12 @@ configure(int type, int v)
   case SENSORS_ACTIVE:
     if (v)
     {
-      if (!I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG1, 0x4F))
-        return false;     /* power up, 200Hz, cut-off 12.5, all axes */
-      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG2, 0x01);     /* normal high-pass, 8Hz cutoff */
+      if (!I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG1, 0x7f))
+        return false;     /* power up, 200Hz, cut-off 70, all axes */
+      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG2, 0x10);     /* normal high-pass, 15Hz@200Hz cutoff */
       I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG3, 0x00);     /* no irqs */
-      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG4, 0xB0);     /* block update, full scale, 2000 dps */
-      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG5, 0x40);     /* fifo enable */
+      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG4, 0xA0);     /* block update, full scale, 2000 dps */
+      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG5, 0x52);     /* fifo enable, low-high-pass enable */
       I2CW(L3G4200D_ADDR,L3G4200D_FIFO_CTRL_REG, 0x40); /* fifo stream mode */
 
       gyro_cb(true);
@@ -128,6 +127,40 @@ configure(int type, int v)
     }
     else   /* power down, keep config */
       return I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG1,0x47);
+
+  case GYRO_L3G_RANGE:
+    if (v==GYRO_L3GVAL_2000DPS)     return I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG4,0xb0);
+    else if (v==GYRO_L3GVAL_500DPS) return I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG4,0x90);
+    else if (v==GYRO_L3GVAL_250DPS) return I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG4,0x80);
+    break;
+
+  case GYRO_L3G_DRATE:
+    I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG1,(v<<4)|0xf);
+    break;
+
+  case GYRO_L3G_HIGHPASS:
+    if (v>GYRO_L3GVAL_HP9)
+      return 1;
+
+    I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG2,(1<<4)|v);
+    /* reset the high-pass filter */
+    { uint8_t buf[] = {L3G4200D_REFERENCE,0}; i2cb(L3G4200D_ADDR,1,1,buf); }
+    break;
+
+  case GYRO_L3G_FILTER:
+    if (v==GYRO_L3GVAL_NONE)
+      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG5,0x40);
+    else if (v==GYRO_L3GVAL_HPFILTER)
+      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG5,0x51);
+    else if (v==GYRO_L3GVAL_LPFILTER)
+      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG5,0x41);
+    else if (v==GYRO_L3GVAL_BOTH)
+      I2CW(L3G4200D_ADDR,L3G4200D_CTRL_REG5,0x53);
+    else
+      return 1;
+    /* reset the high-pass filter */
+    { uint8_t buf[] = {L3G4200D_REFERENCE,0}; i2cb(L3G4200D_ADDR,1,1,buf); }
+    break;
   }
 
   return 0;

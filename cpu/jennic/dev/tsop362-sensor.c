@@ -45,7 +45,9 @@ configure(int type, int value)
     vAHI_UartEnable(E_AHI_UART_0);
     vAHI_UartReset(E_AHI_UART_0, true, true);
     vAHI_UartReset(E_AHI_UART_0, false, false);
-    vAHI_UartSetBaudrate(E_AHI_UART_0, 2400);
+
+    // set baudrate to 2400, divisor is derived from 1mHz clock
+    vAHI_UartSetBaudDivisor(E_AHI_UART_0,417);
 
     vAHI_DioSetDirection(0x00, JENNIC_CONF_TSOP362_PWRPIN);
 

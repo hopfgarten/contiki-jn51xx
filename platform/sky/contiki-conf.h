@@ -201,7 +201,7 @@
 
 #define UIP_CONF_TCP_SPLIT       0
 
-
+#define CC2420_CONF_CHECKSUM 1
 
 
 #endif /* CONTIKI_CONF_H */

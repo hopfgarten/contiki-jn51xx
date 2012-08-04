@@ -149,6 +149,9 @@ tvalue(int type)
 static int
 tconfigure(int type, int value)
 {
+  if (!value)
+    return true;
+
   switch(type) {
   case SENSORS_HW_INIT:
   case SENSORS_ACTIVE:
@@ -272,6 +275,9 @@ pvalue(int type)
 static int
 pconfigure(int type, int value)
 {
+  if (!value)
+    return true;
+
   switch(type) {
   case SENSORS_HW_INIT:
   case SENSORS_ACTIVE:

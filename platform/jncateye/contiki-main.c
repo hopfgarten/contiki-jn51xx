@@ -23,7 +23,7 @@
 
 PROCESS_NAME(ledtest_process);
 PROCINIT(&etimer_process, &sensors_process, &ledtest_process, &tcpip_process, &jennic_bootloader_process);
-SENSORS(&battery_sensor, &lightlevel_sensor, &button_sensor, &acc_sensor, &inttemp_sensor, &temperature_sensor, &infrared_sensor);
+SENSORS(&lightlevel_sensor, &button_sensor, &acc_sensor, &inttemp_sensor, &infrared_sensor);
 void
 init_net(void)
 {

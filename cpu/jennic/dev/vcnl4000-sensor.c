@@ -233,10 +233,9 @@ pconfigure(int type, int value)
   case SENSORS_ACTIVE:
     if (value)
     {
-      return false; // XXX: deactivated for now, need to fix bugs
       clock_delay(250); // needed, to make sure device is already awake
 
-      if (!wreg(VCNL_IR_CURRENT, 1)) // x*10mA
+      if (!wreg(VCNL_IR_CURRENT, 10)) // x*10mA
         return false;
 
       wreg(VCNL_PROX_FREQ, VCNL_390K625);

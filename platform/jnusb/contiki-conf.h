@@ -89,7 +89,7 @@ typedef unsigned short uip_stats_t;
 
 /* 0 to 11  - no fixed channel
  * 11 to 26 - channel fixed to number */
-//#define JENNIC_CONF_COORD_FIXED_CHANNEL         25
+//#define JENNIC_CONF_COORD_FIXED_CHANNEL         26
 
 #endif /* UIP_CONF_IPV6 */
 

@@ -2,7 +2,8 @@ ifndef CONTIKI
   $(error CONTIKI not defined! You must specify where CONTIKI resides!)
 endif
 
-CONTIKI_TARGET_SOURCEFILES += ieee802.c contiki-main.c sd.c ff.c cfs-fatfs.c\
+<<<<<<< HEAD
+CONTIKI_TARGET_SOURCEFILES += ieee802.c contiki-main.c sd.c ff.c cfs-fatfs.c button-sensor.c\
 														 	leds-arch.c leds.c sensors.c bootloader.c\
 															tsl2550-sensor.c
 CONTIKI_TARGET_DIRS += . dev net

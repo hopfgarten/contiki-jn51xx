@@ -4,17 +4,19 @@
 #include "gdb2.h"
 #include "jts.h"
 #include "net/ieee802.h"
+#include "dev/leds.h"
 #include "dev/lightlevel-sensor.h"
 #include "dev/proximity-sensor.h"
 #include "dev/l3g4200d-sensor.h"
 #include "dev/temperature-sensor.h"
 #include "dev/pressure-sensor.h"
+#include "dev/button-sensor.h"
 #include "dev/mag-sensor.h"
 #include "dev/acc-sensor.h"
 #include "AppHardwareApi.h"
 
-PROCINIT(&etimer_process, &tcpip_process, &jennic_bootloader_process);
-SENSORS(&lightlevel_sensor, &l3g4200d_sensor, &mag_sensor, &acc_sensor, &proximity_sensor, &temperature_sensor, &pressure_sensor);
+PROCINIT(&etimer_process, &tcpip_process, &jennic_bootloader_process, &sensors_process);
+SENSORS(&lightlevel_sensor, &l3g4200d_sensor, &mag_sensor, &acc_sensor, &proximity_sensor, &temperature_sensor, &pressure_sensor, &button_sensor);
 
 void
 init_net(void)
@@ -65,7 +67,7 @@ void AppColdStart(void)
 
   /* initialize the sd-card first and wait for power supply to stabilize */
   clock_delay(CLOCK_SECOND/5);
-  
+
   /* start the rest */
   process_init();
   init_net();
@@ -75,10 +77,7 @@ void AppColdStart(void)
   autostart_start(autostart_processes);
   jts_init();
 
-  /* enable watchdog on JN5148, there is none on JN5139 */
-#ifdef __BA2__
-  watchdog_start();
-#endif
+  leds_on(LEDS_ALL);
 
   /* default main loop */
   while(1)

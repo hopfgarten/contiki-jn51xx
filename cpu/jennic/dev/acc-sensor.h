@@ -57,4 +57,31 @@ extern const struct sensors_sensor acc_sensor;
 #define ACC_VALUE_INTSOURCE  0x08
 #define ACC_VALUE_TAPSTATUS  0x09
 
+#define ACC_LSM303_RANGE     0x00 /* resolution */
+#define ACC_LSM303VAL_2G     0x00
+#define ACC_LSM303VAL_4G     0x01
+#define ACC_LSM303VAL_8G     0x03
+
+#define ACC_LSM303_DRATE     0x01 /* digital output rate */
+#define ACC_LSM303VAL_0_5HZ  0x02 /* low-power modes     */
+#define ACC_LSM303VAL_1HZ    0x03
+#define ACC_LSM303VAL_2HZ    0x04
+#define ACC_LSM303VAL_5HZ    0x05
+#define ACC_LSM303VAL_10HZ   0x06
+#define ACC_LSM303VAL_50HZ   0x07 /* normal power-mode   */
+#define ACC_LSM303VAL_100HZ  0x08
+#define ACC_LSM303VAL_400HZ  0x09
+#define ACC_LSM303VAL_1KHZ   0x0A
+
+#define ACC_LSM303_HIGHPASS  0x02 /* set high-pass cut-off */
+                                  /* ODR = 50Hz  | 100Hz | 400Hz | 1kHZ  */
+#define ACC_LSM303VAL_HP0    0x00 /*        1    |   2   |   8   | 20    */
+#define ACC_LSM303VAL_HP1    0x01 /*        .5   |   1   |   4   | 10    */
+#define ACC_LSM303VAL_HP2    0x02 /*        .25  |   .5  |   2   |  5    */
+#define ACC_LSM303VAL_HP3    0x03 /*        .125 |   .25 |   1   |  2.5  */
+
+#define ACC_LSM303_FILTER    0x03 /* enable/disable high- and low-pass      */
+#define ACC_LSM303VAL_NONE   0x00
+#define ACC_LSM303VAL_BOTH   0x03 /* enalbe low- and high-pass (i.e. bandpass) */
+
 #endif

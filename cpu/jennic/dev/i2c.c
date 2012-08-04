@@ -58,7 +58,7 @@ static volatile i2c_t *transaction;
 static void
 i2c_irq(u32_t src, u32_t mask)
 {
-  i2c_status = !bAHI_SiCheckRxNack();
+  i2c_status = !bAHI_SiPollRxNack();
   process_poll(&i2c_process);
 }
 

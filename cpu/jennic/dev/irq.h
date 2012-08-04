@@ -77,7 +77,7 @@ typedef enum
   ADC_INPUT_RANGE_2 = E_AHI_AP_INPUT_RANGE_2  /* double vRef */
 } __attribute((__packed__)) adc_t;
 
-struct irq_handle {
+typedef struct irq_handle {
   struct irq_handle *next;
   void             (*callback)(irq_t);
   irq_t              irqsrc;

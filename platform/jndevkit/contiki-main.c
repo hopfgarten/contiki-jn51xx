@@ -5,9 +5,10 @@
 #include "jts.h"
 #include "net/ieee802.h"
 #include "dev/lightlevel-sensor.h"
+#include "dev/button-sensor.h"
 
 PROCINIT(&etimer_process, &tcpip_process, &jennic_bootloader_process);
-SENSORS(&lightlevel_sensor);
+SENSORS(&lightlevel_sensor, &button_sensor);
 
 void
 init_net(void)

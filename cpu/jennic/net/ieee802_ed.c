@@ -89,7 +89,7 @@ ieee_findpan(MAC_MlmeDcfmInd_s *ind, MAC_PanDescr_s **pan)
 
     PRINTF("panid: 0x%x\n", (int) ((*pan)->sCoord.u16PanId));
 
-    if( (*pan)->sCoord.u16PanId==SICSLOWPAN_PANID &&
+    if( (*pan)->sCoord.u16PanId==IEEE802154_PANDID &&
        ((*pan)->u16SuperframeSpec&0x8000) )
     {
       found=true;
