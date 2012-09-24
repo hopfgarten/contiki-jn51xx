@@ -319,5 +319,5 @@ ieee_serial_init()
   //uart0_init(115200);
   uart0_init(57600);
   uart0_set_input(ieee_serial_input);
-  ieee_serial_open =true;
+  //ieee_serial_open =true;
 }

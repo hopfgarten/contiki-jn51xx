@@ -9,7 +9,7 @@ static uint8_t inited = 0;
 static FATFS fs;
 static FIL file_table[FILE_TABLE_SIZE];
 
-void cfs_shutdown()
+static void cfs_shutdown()
 {
   if (inited) {
     uint8_t i;

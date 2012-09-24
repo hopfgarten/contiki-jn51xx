@@ -2,9 +2,10 @@ ifndef CONTIKI
   $(error CONTIKI not defined! You must specify where CONTIKI resides!)
 endif
 
-CONTIKI_TARGET_SOURCEFILES += ieee802.c contiki-main.c sd.c ff.c cfs-fatfs.c button-sensor.c\
-			      leds-arch.c leds.c sensors.c bootloader.c\
-			      tsl2550-sensor.c
+CONTIKI_TARGET_SOURCEFILES += ieee802.c contiki-main.c pff.c sd.c\
+														 	leds-arch.c leds.c sensors.c bootloader.c\
+															l3g4200d-sensor.c lsm303-sensor.c\
+															vcnl4000-sensor.c mpl115a-sensor.c
 CONTIKI_TARGET_DIRS += . dev net
 CONTIKI_SOURCEFILES += $(CONTIKI_TARGET_SOURCEFILES)
 TARGET_STARTFILES = ${addprefix $(OBJECTDIR)/,contiki-main.o}
@@ -13,4 +14,4 @@ TARGET_STARTFILES = ${addprefix $(OBJECTDIR)/,contiki-main.o}
 
 ### Define the CPU directory
 CONTIKI_CPU=$(CONTIKI)/cpu/jennic
-include $(CONTIKI)/cpu/jennic/Makefile.jn51xx 
+include $(CONTIKI)/cpu/jennic/Makefile.jn51xx

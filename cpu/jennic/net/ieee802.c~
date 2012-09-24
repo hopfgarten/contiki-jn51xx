@@ -457,10 +457,12 @@ PROCESS_THREAD(ieee_process, ev, data)
     {
       if(rxq_peektype()==MLME) {
         //ieee_serial_mlme((MAC_MlmeDcfmInd_s*) macev);
+printf("MLME\r\n");
         ieee_mlmehandler((MAC_MlmeDcfmInd_s*) macev);
       }
       else if(rxq_peektype()==MCPS) {
         //ieee_serial_mcps((MAC_McpsDcfmInd_s*) macev);
+printf("MCPS\r\n");
         ieee_mcpshandler((MAC_McpsDcfmInd_s*) macev);
       }
 

@@ -221,6 +221,11 @@ slip_poll_handler(u8_t *outbuf, u16_t blen)
         len = 0;
       } else {
         memcpy(outbuf, &rxbuf[begin], len);
+	uint16_t i;
+  for (i = 0; i< len; i++)
+    printf("%d ", rxbuf[begin + i]);
+
+  printf("\r\n");
       }
     } else {
       len = (RX_BUFSIZE - begin) + (pkt_end - 0);
@@ -230,10 +235,13 @@ slip_poll_handler(u8_t *outbuf, u16_t blen)
         unsigned i;
         for(i = begin; i < RX_BUFSIZE; i++) {
           *outbuf++ = rxbuf[i];
+           printf("%d ", rxbuf[i]);
         }
         for(i = 0; i < pkt_end; i++) {
           *outbuf++ = rxbuf[i];
+           printf("%d ", rxbuf[i]);
         }
+  printf("\r\n");
       }
     }
 
